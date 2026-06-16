@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: notes-backend-rolebinding
+  namespace: notes-app
+subjects:
+  - kind: ServiceAccount
+    name: notes-backend-serviceaccount
+    namespace: notes-app
+roleRef:
+  kind: Role
+  name: notes-backend-role
+  apiGroup: rbac.authorization.k8s.io

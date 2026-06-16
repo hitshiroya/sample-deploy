@@ -1,0 +1,83 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: notes-app-pipeline
+  namespace: notes-app
+spec:
+  params:
+    - name: repo-url
+      type: string
+    - name: revision
+      type: string
+      default: main
+    - name: image-tag
+      type: string
+      description: Git commit SHA used as image tag
+  workspaces:
+    - name: shared-workspace
+  tasks:
+    - name: clone
+      taskRef:
+        name: clone-repo
+      params:
+        - name: repo-url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+
+    - name: build-backend
+      taskRef:
+        name: build-push
+      runAfter: [clone]
+      params:
+        - name: image
+          value: hit2403/notes-backend
+        - name: tag
+          value: $(params.image-tag)
+        - name: context
+          value: backend
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+
+    - name: build-frontend
+      taskRef:
+        name: build-push
+      runAfter: [clone]
+      params:
+        - name: image
+          value: hit2403/notes-frontend
+        - name: tag
+          value: $(params.image-tag)
+        - name: context
+          value: frontend
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+
+    - name: deploy-backend
+      taskRef:
+        name: update-image-tag
+      runAfter: [build-backend]
+      params:
+        - name: deployment
+          value: notes-backend
+        - name: image
+          value: hit2403/notes-backend
+        - name: tag
+          value: $(params.image-tag)
+
+    - name: deploy-frontend
+      taskRef:
+        name: update-image-tag
+      runAfter: [build-frontend]
+      params:
+        - name: deployment
+          value: notes-frontend
+        - name: image
+          value: hit2403/notes-frontend
+        - name: tag
+          value: $(params.image-tag)

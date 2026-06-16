@@ -1,0 +1,51 @@
+namespace: notes-app
+
+postgres:
+  image:
+    repository: hit2403/notes-postgres
+    tag: v2
+  replicas: 1
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+  storage:
+    size: 1Gi
+
+backend:
+  image:
+    repository: hit2403/notes-backend
+    tag: v2
+  replicas: 1
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+
+frontend:
+  image:
+    repository: hit2403/notes-frontend
+    tag: v3
+  replicas: 1
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
+    limits:
+      cpu: "200m"
+      memory: "128Mi"
+
+ingress:
+  host: ""  # set at deploy time: helm install ... --set ingress.host=notes-app.apps.<cluster-domain>
+
+hpa:
+  backend:
+    minReplicas: 1
+    maxReplicas: 10
+    cpuUtilization: 80

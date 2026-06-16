@@ -1,0 +1,25 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: clone-repo
+  namespace: notes-app
+spec:
+  params:
+    - name: repo-url
+      type: string
+      description: GitHub repository URL
+    - name: revision
+      type: string
+      default: main
+      description: Branch or commit SHA to checkout
+  workspaces:
+    - name: source
+      description: Where the cloned repo will be written
+  steps:
+    - name: clone
+      image: alpine/git:latest
+      script: |
+        git clone $(params.repo-url) $(workspaces.source.path)
+        cd $(workspaces.source.path)
+        git checkout $(params.revision)
+        echo "Cloned $(params.repo-url) at $(params.revision)"

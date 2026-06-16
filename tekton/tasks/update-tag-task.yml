@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: update-image-tag
+  namespace: notes-app
+spec:
+  params:
+    - name: deployment
+      type: string
+      description: Deployment name e.g. notes-backend
+    - name: image
+      type: string
+      description: Full image name e.g. hit2403/notes-backend
+    - name: tag
+      type: string
+      description: New image tag (git commit SHA)
+  steps:
+    - name: patch-deployment
+      image: bitnami/kubectl:latest
+      script: |
+        kubectl set image deployment/$(params.deployment) \
+          $(params.deployment)=$(params.image):$(params.tag) \
+          -n notes-app
+        echo "Updated $(params.deployment) to $(params.image):$(params.tag)"

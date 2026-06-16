@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: notes-frontend
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "notes-app.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: notes-frontend
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: ClusterIP

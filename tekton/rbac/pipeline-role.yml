@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pipeline-role
+  namespace: notes-app
+rules:
+  - apiGroups: [""]
+    resources: ["secrets", "configmaps", "serviceaccounts"]
+    verbs: ["get", "list"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "update", "patch"]
+  - apiGroups: ["tekton.dev"]
+    resources: ["tasks", "pipelines", "pipelineruns", "taskruns"]
+    verbs: ["get", "list", "create", "update", "patch", "delete"]

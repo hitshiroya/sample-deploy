@@ -1,0 +1,38 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: build-push
+  namespace: notes-app
+spec:
+  params:
+    - name: image
+      type: string
+      description: Docker Hub image name e.g. hit2403/notes-backend
+    - name: tag
+      type: string
+      description: Image tag e.g. git commit SHA
+    - name: context
+      type: string
+      description: Path to the service folder e.g. backend or frontend
+  workspaces:
+    - name: source
+      description: Contains the cloned repo
+  steps:
+    - name: build-and-push
+      image: gcr.io/kaniko-project/executor:latest
+      args:
+        - --dockerfile=$(workspaces.source.path)/$(params.context)/Dockerfile
+        - --context=$(workspaces.source.path)/$(params.context)
+        - --destination=$(params.image):$(params.tag)
+        - --destination=$(params.image):latest
+        - --platform=linux/amd64
+      volumeMounts:
+        - name: docker-config
+          mountPath: /kaniko/.docker
+  volumes:
+    - name: docker-config
+      secret:
+        secretName: dockerhub-secret
+        items:
+          - key: .dockerconfigjson
+            path: config.json
