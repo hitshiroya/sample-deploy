@@ -42,8 +42,13 @@ spec:
             value: $(tt.params.image-tag)
         workspaces:
           - name: shared-workspace
-            persistentVolumeClaim:
-              claimName: pipeline-workspace-pvc
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
 
 ---
 apiVersion: triggers.tekton.dev/v1beta1
