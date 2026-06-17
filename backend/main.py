@@ -25,7 +25,7 @@ def root():
     return {"message": "Notes API is running"}
 
 
-@app.get("/health")
+@app.get("/api/health")
 def health():
     try:
         db = SessionLocal()
